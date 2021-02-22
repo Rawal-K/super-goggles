@@ -1,0 +1,88 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const schedule = require('node-schedule');
+const dbConfig = require('./config/database.config.js');
+const mongoose = require('mongoose');
+const Request = require("request");
+const fs = require('fs');
+
+const app = express();
+
+
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: true })); 
+
+app.get('/', (req, res) => {
+    res.json({"message": "Welcome to Test application."});
+});
+
+
+
+const postUrl = "http://localhost:3000/user";
+const getUrl = "http://localhost:3000/user/";
+
+
+postDataInDB = () => {
+	return new Promise((resolve, reject) => {
+        Request.post({url:postUrl, form: {"name":'John Doe', "hobbies": "Computer Programming"}}, (err, httpResponse, body) => { 
+		if(err) return reject(err);
+                        try{
+                                resolve(JSON.parse(body));
+                        }catch(error){
+                                reject(error);
+                        }
+                });
+	});
+}
+
+getDataFromDB = (userId) => {
+        return new Promise((resolve, reject) => {
+                Request(getUrl + userId, (err, res, body) => {
+                if(err) return reject(err);
+                        try{
+                                resolve(JSON.parse(body));
+                        }catch(error){
+                                reject(error);
+                        }
+                });
+        });
+}
+
+writeDataInFile = (path, data) => {
+	return new Promise((resolve, reject) => {
+		fs.appendFile(path, data, (err, data) => {
+			if(err) return reject(err);
+			try{
+				resolve(data);
+			}catch(error){
+				reject(error);
+			}
+		});					
+	});
+}
+
+const job = schedule.scheduleJob('42 * * * * *', async () => {
+	const path = 'backup_user.txt';
+	const { _id }  = await postDataInDB();
+	const getData = await getDataFromDB(_id);
+	const writeData = await writeDataInFile(path, getData);
+	console.log('writeData', writeData);
+});
+
+
+require('./routes/user.routes.js')(app);
+app.listen(3000, () => {
+    console.log("Server is listening on port 3000");
+});
+
+mongoose.Promise = global.Promise;
+
+mongoose.connect(dbConfig.url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("Successfully connected to the database");    
+}).catch(err => {
+    console.log('Could not connect to the database. Exiting now...', err);
+    process.exit();
+});
