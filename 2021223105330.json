@@ -1,0 +1,43 @@
+{
+  _id: 6034913449a5f6169df204a8,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:00.029Z,
+  updatedAt: 2021-02-23T05:23:00.029Z,
+  __v: 0
+},{
+  _id: 6034913949a5f6169df204a9,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:05.009Z,
+  updatedAt: 2021-02-23T05:23:05.009Z,
+  __v: 0
+},{
+  _id: 6034913e49a5f6169df204aa,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:10.008Z,
+  updatedAt: 2021-02-23T05:23:10.008Z,
+  __v: 0
+},{
+  _id: 6034914349a5f6169df204ab,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:15.011Z,
+  updatedAt: 2021-02-23T05:23:15.011Z,
+  __v: 0
+},{
+  _id: 6034914849a5f6169df204ac,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:20.011Z,
+  updatedAt: 2021-02-23T05:23:20.011Z,
+  __v: 0
+},{
+  _id: 6034914d49a5f6169df204ad,
+  name: 'John Doe',
+  hobbies: 'Computer Programming',
+  createdAt: 2021-02-23T05:23:25.013Z,
+  updatedAt: 2021-02-23T05:23:25.013Z,
+  __v: 0
+}

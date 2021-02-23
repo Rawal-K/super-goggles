@@ -37,38 +37,12 @@ postDataInDB = () => {
 	});
 }
 
-getDataFromDB = (userId) => {
-        return new Promise((resolve, reject) => {
-                Request(getUrl + userId, (err, res, body) => {
-                if(err) return reject(err);
-                        try{
-                                resolve(body);
-                        }catch(error){
-                                reject(error);
-                        }
-                });
-        });
-}
-
 writeDataInFile = (path, data) => {
 	return new Promise((resolve, reject) => {
 		fs.appendFile(path, data, (err, data) => {
 			if(err) return reject(err);
 		});					
 	});
-}
-
-readDataFromFile = () => {
-	return new Promise((resolve, reject) => {
-		fs.readFile('backup_user.json', 'utf8', (err, data) => {
-		if(err) return reject(err);
-			try{
-				resolve(data);
-			}catch(error){
-				reject(error);
-			}
-		});
-	}); 	
 }
 
 getLastMinuteData = () => {
@@ -94,19 +68,19 @@ convertDateTimeFormatForFileName = () => {
 	return result;
 }
 
-/* Write data in DB for every 5 second */
+/* Cron that write data in DB for every 5 seconds */
 const job1 = schedule.scheduleJob('0-59/5 * * * * *', async() => {
 	const data = await postDataInDB();
 	console.log('Every 5 second cron');
 });
 
-
+/* Cron that backups data in file every 30 seconds */
 const job = schedule.scheduleJob('0-59/30 * * * * *', async () => {
 	console.log('**********Every 30second cron****************'); 
 	const jsonData = await getLastMinuteData();
 	console.log('jsonData', jsonData);
 	const fileName = convertDateTimeFormatForFileName();
-	await writeDataInFile(`${fileName}.json`, jsonData);
+	await writeDataInFile(`${fileName}.json`, jsonData); 
 }); 
 
 
