@@ -21,8 +21,6 @@ app.get('/', (req, res) => {
 
 
 const postUrl = "http://localhost:3000/user";
-const getUrl = "http://localhost:3000/user/";
-
 
 postDataInDB = () => {
 	return new Promise((resolve, reject) => {
@@ -68,17 +66,14 @@ convertDateTimeFormatForFileName = () => {
 	return result;
 }
 
-/* Cron that write data in DB for every 5 seconds */
+/* Cron that writes data in DB for every 5 seconds */
 const job1 = schedule.scheduleJob('0-59/5 * * * * *', async() => {
 	const data = await postDataInDB();
-	console.log('Every 5 second cron');
 });
 
 /* Cron that backups data in file every 30 seconds */
 const job = schedule.scheduleJob('0-59/30 * * * * *', async () => {
-	console.log('**********Every 30second cron****************'); 
 	const jsonData = await getLastMinuteData();
-	console.log('jsonData', jsonData);
 	const fileName = convertDateTimeFormatForFileName();
 	await writeDataInFile(`${fileName}.json`, jsonData); 
 }); 
