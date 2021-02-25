@@ -1,0 +1,16 @@
+HTTP/2 401 
+www-authenticate: Bearer realm="https://accounts.google.com/", error="invalid_token"
+vary: Origin
+vary: X-Origin
+vary: Referer
+content-type: application/json; charset=UTF-8
+content-encoding: gzip
+date: Wed, 24 Feb 2021 14:03:05 GMT
+server: ESF
+cache-control: private
+content-length: 226
+x-xss-protection: 0
+x-frame-options: SAMEORIGIN
+x-content-type-options: nosniff
+alt-svc: h3-29=":443"; ma=2592000,h3-T051=":443"; ma=2592000,h3-Q050=":443"; ma=2592000,h3-Q046=":443"; ma=2592000,h3-Q043=":443"; ma=2592000,quic=":443"; ma=2592000; v="46,43"
+

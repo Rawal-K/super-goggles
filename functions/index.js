@@ -7,10 +7,10 @@ const Request = require("request");
 const fs = require('fs');
 const zlib = require('zlib')
 const User = require('./models/user.model.js');
-
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
 const app = express();
-
 
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -95,19 +95,34 @@ unlinkJSONFile = (fileName) => {
         });
 }
 
-/* Cron that writes data in DB for every 5 seconds */
-const job1 = schedule.scheduleJob('0-59/5 * * * * *', async() => {
-	const data = await postDataInDB();
-});
+(async () => {
+	try{
+		admin.initializeApp();
+		const remoteConfig = await admin.remoteConfig();
+		const template = await remoteConfig.getTemplate();
+		const value = JSON.stringify(template);
+        	cronWriteTime = JSON.parse(value).parameters.cronWriteTime.defaultValue.value;
+		cronBackupTime = JSON.parse(value).parameters.cronBackupTime.defaultValue.value;
 
-/* Cron that backups data in file every 30 seconds */
-const job = schedule.scheduleJob('0-59/30 * * * * *', async () => {
-	const jsonData = await getLastMinuteData();
-	const fileName = await convertDateTimeFormatForFileName();
-	await writeDataInFile(`${fileName}.json`, jsonData); 
-	await convertFileToGzip(fileName);
-	await unlinkJSONFile(fileName);
-}); 
+		/** cron job that write files in DB at every cronWriteTime **/
+		const job = schedule.scheduleJob(cronWriteTime, async() => {
+        		const data = await postDataInDB();
+			console.log('data', data);
+		});
+
+		/* Cron that backups data in file every cronBackupTime */
+		const job1 = schedule.scheduleJob(cronBackupTime, async () => {
+        		const jsonData = await getLastMinuteData();
+        		const fileName = await convertDateTimeFormatForFileName();
+			console.log('fileName', fileName);
+        		await writeDataInFile(`${fileName}.json`, jsonData);
+        		await convertFileToGzip(fileName);
+        		await unlinkJSONFile(fileName);
+		});
+	}catch(error){
+		console.log(error);
+	}	
+})();
 
 
 require('./routes/user.routes.js')(app);
@@ -126,3 +141,5 @@ mongoose.connect(dbConfig.url, {
     console.log('Could not connect to the database. Exiting now...', err);
     process.exit();
 });
+
+exports.app = functions.https.onRequest(app);
