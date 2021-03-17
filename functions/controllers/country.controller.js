@@ -5,10 +5,8 @@ const responseObject = new ResponseObject();
 
 
 exports.create = (req, res) => {
-     if(!req.body) {
-        return res.status(400).send({
-            message: "Country cannot be empty"
-        });
+    if(!req.body) {
+	return next(new AppError("Country cannot be empty", 400)); 
     }
 
     const country = new Country({
@@ -44,4 +42,3 @@ exports.findAll = (req, res) => {
 	return next(new AppError(err.message, 500));
     });
 };
-
