@@ -1,9 +1,12 @@
+const ResponseObject = require('../helpers/responseObjectClass');
+const AppError = require('../helpers/AppError');
 const User = require('../models/user.model.js');
+const responseObject = new ResponseObject();
+
+
 exports.create = (req, res) => {
      if(!req.body.hobbies) {
-        return res.status(400).send({
-            message: "User hobbies cannot be empty"
-        });
+	return next(new AppError("User hobbies can't be empty", 400));     
     }
 
     const user = new User({
@@ -13,11 +16,15 @@ exports.create = (req, res) => {
 
     user.save()
     .then(data => {
-        res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error occurred while creating the User."
+	const returnObj = responseObject.create({
+                code: 200,
+                success: true,
+                data: data,
+                message: 'User has been created successfully'
         });
+        return res.send(returnObj);
+    }).catch(err => {
+	return next(new AppError(err.message, 500));    
     });
 };
 
@@ -25,11 +32,15 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
     User.find()
     .then(users => {
-        res.send(users);
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message || "Some error occurred while retrieving users."
+	const returnObj = responseObject.create({
+                code: 200,
+                success: true,
+                data: users,
+                message: 'Users has been fetched successfully'
         });
+        return res.send(returnObj);
+    }).catch(err => {
+	return next(new AppError(err.message, 500));    
     });
 };
 
@@ -37,20 +48,20 @@ exports.findOne = (req, res) => {
     User.findById(req.params.userId)
     .then(user => {
         if(!user) {
-            return res.status(404).send({
-                message: "User not found with id " + req.params.userId
-            });            
+	    return next(new AppError(`User not found with id + {req.params.userId}`, 404));			
         }
-        res.send(user);
+	const returnObj = responseObject.create({
+                code: 200,
+                success: true,
+                data: user,
+                message: 'User has been fetched successfully'
+        });
+        return res.send(returnObj);
     }).catch(err => {
         if(err.kind === 'ObjectId') {
-            return res.status(404).send({
-                message: "User not found with id " + req.params.userId
-            });                
+	    return next(new AppError(`User not found with id + ${req.params.userId}`, 404));	
         }
-        return res.status(500).send({
-            message: "Error retrieving user with id " + req.params.userId
-        });
+	return next(new AppError(`Error retrieving user with id + ${req.params.userId}`, 500));    
     });
 };
 
@@ -58,15 +69,17 @@ exports.deleteAll = (req, res) => {
 	User.deleteMany()
 	.then(user => {
 	    if(!user){
-		return res.status(404).send({
-		    message: "No user found. Database is empty"	
-		});		    					
+		return next(new AppError("No user found. Database is empty", 404));    		    					
 	    }
-	    res.send(user);	
+	    const returnObj = responseObject.create({
+                code: 200,
+                success: true,
+                data: user,
+                message: 'Users has been deleted successfully'
+        });
+        return res.send(returnObj);
 	}).catch(err => {
-	    return res.status(500).send({
-	        message: "Error deleting the users."		
-	    });	
+	    return next(new AppError('Error deleting the users', 500));	
 	});
 };
 
